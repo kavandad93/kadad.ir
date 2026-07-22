@@ -1,0 +1,192 @@
+/* کل صفحه */
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #0f0f0f;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  top: 0;
+}
+
+/* Title و Settings */
+.header div {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Main container */
+.main {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+/* کارت‌ها */
+/* کارت اصلی */
+
+/* کارت اصلی = گرید */
+.main-card {
+  background: #1a1a1a;
+  padding: 16px;
+  border-radius: 16px;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+
+  margin: 16px; /* فاصله بین main-card ها */
+
+}
+.log {
+  background: #1a1a1a;
+  padding: 16px;
+  border-radius: 16px;
+
+  display: grid;
+  gap: 12px;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+
+  margin: 16px; /* فاصله بین main-card ها */
+
+}
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: #2a2a2a;
+  padding: 18px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* افکت لمس */
+.card:active {
+  transform: scale(0.95);
+}
+
+/* Hover (وقتی لمس یا انتخاب میشه) */
+.card:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* افکت روشن شدن ملایم */
+.card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+}
+/* Popup overlay */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.2s ease;
+}
+
+/* حالت فعال شدن popup */
+.popup.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* باکس داخل popup */
+.popup-box {
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 16px;
+
+  width: 80%;
+  max-width: 300px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+
+  transform: scale(0.9);
+  transition: 0.2s ease;
+}
+
+.button {
+  background: lime;
+  color: black;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+
+  font-weight: bold;
+  cursor: pointer;
+
+  box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+  transition: 0.2s ease;
+}
+.text {
+  background: "00cc00";
+  color: black;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+
+  font-weight: bold;
+  cursor: pointer;
+
+  box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+  transition: 0.2s ease;
+}
+
+/* حالت فشار دادن */
+.button:active {
+  transform: scale(0.95);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+}
+
+/* وقتی popup فعال شد */
+.popup.active .popup-box {
+  transform: scale(1);
+}
+.slider {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+  border-radius: 999px;
+  background: #2a2a2a;
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: lime;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}

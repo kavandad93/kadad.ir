@@ -1,0 +1,26 @@
+{
+    "t1": {
+        "username": "\u062a\u0633\u062a",
+        "password": "$2y$10$46KdY5dKecW6TGyOdsIaWOh6TuQkN0Tkz4OqxgOJgbzX\/g\/HVgyoe",
+        "profile_pic": "default.png",
+        "friends": [],
+        "blocked": [],
+        "created_at": "2026-05-23 13:05:15"
+    },
+    "\u0631\u0630\u0632 \u0631": {
+        "username": "KavanTest1",
+        "password": "$2y$10$YlmWoPVHY9kPJi.LNW7Xt.5ZzFMrICZwIVhUfQ8DW7p7OUPClgpsG",
+        "profile_pic": "default.png",
+        "friends": [],
+        "blocked": [],
+        "created_at": "2026-06-20 16:19:30"
+    },
+    "rfgvdfgv": {
+        "username": "KavanTest1",
+        "password": "$2y$10$CGW7UKmxDddwdc3fSU..vehNlGQGhZTEKOa.BWzql.MayPNIR.eJy",
+        "profile_pic": "default.png",
+        "friends": [],
+        "blocked": [],
+        "created_at": "2026-06-20 16:19:38"
+    }
+}
