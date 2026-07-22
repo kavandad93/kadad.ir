@@ -1,0 +1,118 @@
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<div class="header">
+  <div>TentOS⛺️</div>
+  <button class="button" onclick="openPopup()">
+  Setting
+  </button>
+</div>
+
+
+
+
+<div class="cards">
+  
+  <div class="main-card">
+    <div class="card">
+      Temp🌡:
+      **
+    </div>
+    <div class="card">
+      Hum💦:
+      **%
+    </div>
+    <div class="card">
+      Door🚪:
+      Open
+    </div>
+    <div class="card">
+      Rain Shield☔️:
+      Not Installed⚠️
+    </div>
+  </div>
+  
+  <div class="main-card">
+    <div class="card">night mode🌙</div>
+    <div class="card">panic mode🚨</div>
+    <div class="card">Main light on/off</div>
+    <div class="card">RGB on/off</div>
+    <div class="card">
+      Main light brightness
+      
+      <input type="range" class="slider" min="0" max="100" value="50">
+    </div>
+    <div class="card">
+      RGB brightness
+      
+      <input type="range" class="slider" min="0" max="100" value="50"> 
+    </div>
+    
+  </div>
+  
+  <div class="main-card">
+    <H2>RGB mode</h2>
+    <div class="card">fade RGB</div>
+    <div class="card">jump RGB</div>
+    <div class="card">RGBYBPW</div>
+    <div class="card">
+      Custom color
+      <input type="color" value="#000000">
+    </div>
+    
+  </div>
+  
+  <div class="log">
+    <textarea rows="5" readonly>[today 18:01] door opened🚪
+</textarea>
+  </div>
+  
+</div>
+
+
+
+
+
+<div class="popup" id="myPopup">
+  
+  
+  
+  <div class="popup-box">
+    
+    
+    
+    <h3>Settings</h3>
+    <div class="card">
+      mosquito notif
+    <input type="text" value="پشه اومد!" class="text">
+    </div>
+    
+    
+    
+    
+    
+    
+    <button class="button">Save</button>
+    <button class="button" onclick="closePopup()">
+      Close
+    </button>
+    
+    
+    
+  </div>
+  
+  
+  
+  
+</div>
+
+<script>
+function openPopup() {
+  document.getElementById("myPopup").classList.add("active");
+}
+
+function closePopup() {
+  document.getElementById("myPopup").classList.remove("active");
+}
+</script>

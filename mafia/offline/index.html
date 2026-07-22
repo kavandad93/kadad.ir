@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>مافیا - مود آفلاین (راوی)</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="container" id="app">
+    <h1>🎭 بازی مافیا - مود آفلاین (راوی)</h1>
+    
+    <div class="mode-selector">
+        <div class="mode-btn" data-mode="classic" onclick="selectGameMode('classic')">🎭 کلاسیک</div>
+        <div class="mode-btn" data-mode="advanced" onclick="selectGameMode('advanced')">⚡ پیشرفته</div>
+    </div>
+    
+    <div class="status-panel">
+        <h3 id="gameStateText">⚙️ مرحله: تنظیم بازی</h3>
+        <div id="extraInfo"></div>
+        <div id="detectiveResultBox" class="detective-result-box"></div>
+    </div>
+    
+    <div id="setupPanel">
+        <h2>📝 ورود اسامی بازیکنان</h2>
+        <div id="namesInputArea" class="flex-center" style="flex-direction: column;">
+            <div id="nameInputs" class="flex-center"></div>
+            <div class="flex-center">
+                <button onclick="addPlayerField()">➕ افزودن بازیکن</button>
+                <button class="primary" onclick="goToRoleSelection()">▶️ ادامه و تعیین نقش‌ها</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="rolePanel" style="display:none;">
+        <h2>🎭 تعداد هر نقش را مشخص کنید</h2>
+        <div id="roleCountsArea" class="role-selector"></div>
+        <div id="roleError" style="color:#e84118; text-align:center;"></div>
+        <div class="flex-center">
+            <button class="primary" onclick="assignRolesAndStart()">🎲 شروع بازی و تخصیص تصادفی نقش‌ها</button>
+        </div>
+    </div>
+    
+    <div id="gamePanel" style="display:none;">
+        <div class="map" id="playersMap"></div>
+        <div id="actionPanel">
+            <div id="talkPanel" style="display:none;">
+                <div class="speaker-box">
+                    🎙️ نوبت صحبت: <span id="currentSpeakerName"></span>
+                    <div class="timer">⏱️ <span id="timerCount">30</span> ثانیه</div>
+                    <div class="flex-center">
+                        <button onclick="nextSpeaker()">✅ پایان صحبت نفر فعلی</button>
+                    </div>
+                </div>
+            </div>
+            <div id="nightPanel" style="display:none;">
+                <h3>🌙 شب - اقدامات</h3>
+                <div id="mafiaSection">
+                    <h4>🗡️ مافیا قربانی را انتخاب کند:</h4>
+                    <div id="mafiaTargets" class="vote-buttons"></div>
+                </div>
+                <div id="janitorSection" style="display:none;">
+                    <h4>🧹 ژنیتر: صحنه جرم را به نام چه کسی بزند؟</h4>
+                    <div id="janitorTargets" class="vote-buttons"></div>
+                </div>
+                <div id="doctorSection" style="display:none;">
+                    <h4>💊 دکتر نفر مورد نظر برای نجات را انتخاب کند:</h4>
+                    <div id="doctorTargets" class="vote-buttons"></div>
+                </div>
+                <div id="detectiveSection" style="display:none;">
+                    <h4>🔎 کارآگاه از چه کسی استعلام بگیرد؟</h4>
+                    <div id="detectiveTargets" class="vote-buttons"></div>
+                </div>
+                <div id="escortSection" style="display:none;">
+                    <h4>💃 اسکورت: حواس چه کسی را پرت کند؟</h4>
+                    <div id="escortTargets" class="vote-buttons"></div>
+                </div>
+                <div id="werewolfSection" style="display:none;">
+                    <h4>🐺 ورولو (فقط شب ماه کامل): قربانی را انتخاب کن</h4>
+                    <div id="werewolfTargets" class="vote-buttons"></div>
+                </div>
+                <div id="vampireSection" style="display:none;">
+                    <h4>🧛 ومپایر: چه کسی را گاز می‌گیری؟</h4>
+                    <div id="vampireTargets" class="vote-buttons"></div>
+                </div>
+                <div class="flex-center">
+                    <button class="primary" onclick="submitNightActions()">✅ تأیید و پایان شب</button>
+                </div>
+            </div>
+            <div id="votingPanel" style="display:none;">
+                <h3 id="votingTitle">🗳️ رأی‌گیری</h3>
+                <div id="votingOptions"></div>
+                <div class="flex-center">
+                    <button class="primary" onclick="finalizeVoting()">✅ اعلام نتایج رأی‌گیری</button>
+                </div>
+            </div>
+        </div>
+        <div class="flex-center" style="margin-top: 20px;">
+            <button class="warning" onclick="nextPhase()">⏩ مرحله بعد</button>
+            <button class="danger" onclick="resetFullGame()">🔄 ریست کامل بازی</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let players = [];
+    let gameMode = "advanced";
+    let gameState = "setup";
+    let currentTalkIndex = 0;
+    let timerInterval = null;
+    let remainingTime = 30;
+    let nightCount = 0;
+    
+    let selectedMafiaTarget = null;
+    let selectedJanitorTarget = null;
+    let selectedDoctorTarget = null;
+    let selectedDetectiveTarget = null;
+    let selectedEscortTarget = null;
+    let selectedWerewolfTarget = null;
+    let selectedVampireTarget = null;
+    
+    let currentVotingRound = 1;
+    let votingTemp = [];
+    let lastNightResult = "";
+    let detectiveBlocked = false;
+    
+    const advancedRoles = ["mafia", "doctor", "detective", "civilian", "janitor", "joker", "escort", "werewolf", "vampire"];
+    const classicRoles = ["mafia", "doctor", "detective", "civilian"];
+    
+    function selectGameMode(mode) {
+        gameMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+    }
+    
+    function updateUI() { renderPlayersMap(); updateStatusText(); }
+    
+    function renderPlayersMap() {
+        let mapDiv = document.getElementById("playersMap");
+        if (!mapDiv) return;
+        mapDiv.innerHTML = "";
+        for (let i = 0; i < players.length; i++) {
+            let p = players[i];
+            let card = document.createElement("div");
+            card.className = "player-card" + (p.isAlive ? "" : " dead");
+            let roleClass = "", roleText = "";
+            switch(p.role) {
+                case "mafia": roleClass = "role-mafia"; roleText = "مافیا"; break;
+                case "doctor": roleClass = "role-doctor"; roleText = "دکتر"; break;
+                case "detective": roleClass = "role-detective"; roleText = "کارآگاه"; break;
+                case "civilian": roleClass = "role-civilian"; roleText = "شهروند"; break;
+                case "janitor": roleClass = "role-janitor"; roleText = "ژنیتر"; break;
+                case "joker": roleClass = "role-joker"; roleText = "جوکر"; break;
+                case "escort": roleClass = "role-escort"; roleText = "اسکورت"; break;
+                case "werewolf": roleClass = "role-werewolf"; roleText = "ورولو"; break;
+                case "vampire": roleClass = "role-vampire"; roleText = "ومپایر"; break;
+                default: roleClass = "role-civilian"; roleText = "شهروند";
+            }
+            card.innerHTML = `<div class="player-name">${p.name}</div><div class="player-role ${roleClass}">${roleText}</div>${p.voteCount > 0 ? `<div class="vote-badge">${p.voteCount}</div>` : ""}`;
+            mapDiv.appendChild(card);
+        }
+    }
+    
+    function updateStatusText() {
+        let stateText = document.getElementById("gameStateText");
+        let extra = document.getElementById("extraInfo");
+        if (!stateText) return;
+        switch(gameState) {
+            case "setup": stateText.innerText = "⚙️ مرحله: ورود اسامی بازیکنان"; break;
+            case "roleSelect": stateText.innerText = "🎭 مرحله: انتخاب تعداد نقش‌ها"; break;
+            case "dayTalk": stateText.innerText = "☀️ روز - صحبت بازیکنان"; break;
+            case "night": stateText.innerText = `🌙 شب ${Math.floor(nightCount/2)+1} - اقدامات ویژه`; break;
+            case "voting1": stateText.innerText = "🗳️ رأی‌گیری مرحله اول"; break;
+            case "voting2": stateText.innerText = "😴 خواب نیم‌روزی - رأی‌گیری نهایی"; break;
+            default: stateText.innerText = "بازی در جریان";
+        }
+        if (extra && lastNightResult) extra.innerHTML = `<div>${lastNightResult}</div>`;
+    }
+    
+    function updateVoteBadges() {
+        for(let i=0;i<players.length;i++) players[i].voteCount = 0;
+        for(let i=0;i<players.length;i++) {
+            if(votingTemp[i] && votingTemp[i].length) {
+                for(let targetName of votingTemp[i]) {
+                    let targetIndex = players.findIndex(p => p.name === targetName);
+                    if(targetIndex !== -1) players[targetIndex].voteCount++;
+                }
+            }
+        }
+        renderPlayersMap();
+    }
+    
+    function addPlayerField() {
+        let container = document.getElementById("nameInputs");
+        let inputDiv = document.createElement("div");
+        inputDiv.className = "flex-center";
+        inputDiv.innerHTML = `<input type="text" placeholder="اسم بازیکن" class="player-name-input" style="width:150px;"> <button onclick="this.parentElement.remove()">❌</button>`;
+        container.appendChild(inputDiv);
+    }
+    
+    function goToRoleSelection() {
+        let nameInputs = document.querySelectorAll("#nameInputs .player-name-input");
+        let namesList = [];
+        nameInputs.forEach(inp => { if(inp.value.trim() !== "") namesList.push(inp.value.trim()); });
+        if(namesList.length < 5) { alert("حداقل ۵ بازیکن نیاز است!"); return; }
+        players = namesList.map(name => ({ name, role: "", isAlive: true, voteCount: 0, votedFor: [] }));
+        document.getElementById("setupPanel").style.display = "none";
+        document.getElementById("rolePanel").style.display = "block";
+        gameState = "roleSelect";
+        renderRoleOptions();
+        updateUI();
+    }
+    
+    function renderRoleOptions() {
+        let container = document.getElementById("roleCountsArea");
+        container.innerHTML = "";
+        let rolesList = (gameMode === "classic") ? classicRoles : advancedRoles;
+        let defaultValues = { mafia: 1, doctor: 1, detective: 1, civilian: 2, janitor: 0, joker: 0, escort: 0, werewolf: 0, vampire: 0 };
+        rolesList.forEach(role => {
+            let roleName = { mafia: "مافیا", doctor: "دکتر", detective: "کارآگاه", civilian: "شهروند", janitor: "ژنیتر", joker: "جوکر", escort: "اسکورت", werewolf: "ورولو", vampire: "ومپایر" }[role];
+            let div = document.createElement("div");
+            div.className = "role-card";
+            div.innerHTML = `<div>${roleName}</div><input type="number" id="role_${role}" min="0" max="5" value="${defaultValues[role]}">`;
+            container.appendChild(div);
+        });
+    }
+    
+    function assignRolesAndStart() {
+        let rolesNeeded = [];
+        let rolesList = (gameMode === "classic") ? classicRoles : advancedRoles;
+        for(let role of rolesList) {
+            let count = parseInt(document.getElementById(`role_${role}`)?.value || 0);
+            for(let i=0; i<count; i++) rolesNeeded.push(role);
+        }
+        if(rolesNeeded.length !== players.length) {
+            document.getElementById("roleError").innerText = `تعداد نقش‌ها (${rolesNeeded.length}) با تعداد بازیکنان (${players.length}) همخوانی ندارد!`;
+            return;
+        }
+        if(!rolesNeeded.includes("mafia")) { document.getElementById("roleError").innerText = "حداقل یک مافیا نیاز است!"; return; }
+        for(let i=rolesNeeded.length-1;i>0;i--) { let j = Math.floor(Math.random()*(i+1)); [rolesNeeded[i], rolesNeeded[j]] = [rolesNeeded[j], rolesNeeded[i]]; }
+        for(let i=0;i<players.length;i++) players[i].role = rolesNeeded[i];
+        document.getElementById("rolePanel").style.display = "none";
+        document.getElementById("gamePanel").style.display = "block";
+        gameState = "dayTalk";
+        currentTalkIndex = 0;
+        nightCount = 0;
+        startTalkPhase();
+        updateUI();
+    }
+    
+    function startTalkPhase() {
+        let alivePlayers = players.filter(p => p.isAlive);
+        if(alivePlayers.length === 0) return;
+        if(currentTalkIndex >= alivePlayers.length) {
+            gameState = "night";
+            nightCount++;
+            stopTimer();
+            updateUI();
+            document.getElementById("talkPanel").style.display = "none";
+            document.getElementById("nightPanel").style.display = "block";
+            prepareNightPhase();
+            return;
+        }
+        let speaker = alivePlayers[currentTalkIndex];
+        document.getElementById("currentSpeakerName").innerText = speaker.name;
+        document.getElementById("talkPanel").style.display = "block";
+        document.getElementById("nightPanel").style.display = "none";
+        document.getElementById("votingPanel").style.display = "none";
+        remainingTime = 30;
+        startTimer();
+    }
+    
+    function startTimer() {
+        if(timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if(remainingTime <= 0) { clearInterval(timerInterval); nextSpeaker(); }
+            else { remainingTime--; let timerSpan = document.getElementById("timerCount"); if(timerSpan) timerSpan.innerText = remainingTime; }
+        }, 1000);
+    }
+    
+    function stopTimer() { if(timerInterval) clearInterval(timerInterval); }
+    window.nextSpeaker = function() { stopTimer(); let alivePlayers = players.filter(p => p.isAlive); currentTalkIndex++; startTalkPhase(); };
+    
+    function prepareNightPhase() {
+        selectedMafiaTarget = selectedJanitorTarget = selectedDoctorTarget = selectedDetectiveTarget = selectedEscortTarget = selectedWerewolfTarget = selectedVampireTarget = null;
+        detectiveBlocked = false;
+        document.getElementById("detectiveResultBox").style.display = "none";
+        let alivePlayers = players.filter(p => p.isAlive);
+        let mafiaExists = players.some(p => p.role === "mafia" && p.isAlive);
+        let doctorExists = players.some(p => p.role === "doctor" && p.isAlive);
+        let detectiveExists = players.some(p => p.role === "detective" && p.isAlive);
+        let janitorExists = (gameMode === "advanced") && players.some(p => p.role === "janitor" && p.isAlive);
+        let escortExists = (gameMode === "advanced") && players.some(p => p.role === "escort" && p.isAlive);
+        let werewolfExists = (gameMode === "advanced") && players.some(p => p.role === "werewolf" && p.isAlive);
+        let vampireExists = (gameMode === "advanced") && players.some(p => p.role === "vampire" && p.isAlive);
+        let isFullMoon = (nightCount % 4 == 0);
+        
+        let mafiaDiv = document.getElementById("mafiaTargets");
+        if(mafiaExists) {
+            document.getElementById("mafiaSection").style.display = "block";
+            mafiaDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#mafiaTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedMafiaTarget = p.name; }; mafiaDiv.appendChild(btn); });
+        } else document.getElementById("mafiaSection").style.display = "none";
+        
+        let janitorDiv = document.getElementById("janitorTargets");
+        if(janitorExists && mafiaExists) {
+            document.getElementById("janitorSection").style.display = "block";
+            janitorDiv.innerHTML = "";
+            let nonMafiaAlive = alivePlayers.filter(p => p.role !== "mafia");
+            nonMafiaAlive.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#janitorTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedJanitorTarget = p.name; }; janitorDiv.appendChild(btn); });
+        } else document.getElementById("janitorSection").style.display = "none";
+        
+        let doctorDiv = document.getElementById("doctorTargets");
+        if(doctorExists) {
+            document.getElementById("doctorSection").style.display = "block";
+            doctorDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#doctorTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedDoctorTarget = p.name; }; doctorDiv.appendChild(btn); });
+        } else document.getElementById("doctorSection").style.display = "none";
+        
+        let detectiveDiv = document.getElementById("detectiveTargets");
+        if(detectiveExists) {
+            document.getElementById("detectiveSection").style.display = "block";
+            detectiveDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#detectiveTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedDetectiveTarget = p.name; }; detectiveDiv.appendChild(btn); });
+        } else document.getElementById("detectiveSection").style.display = "none";
+        
+        let escortDiv = document.getElementById("escortTargets");
+        if(escortExists) {
+            document.getElementById("escortSection").style.display = "block";
+            escortDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#escortTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedEscortTarget = p.name; if(p.role === "detective") detectiveBlocked = true; }; escortDiv.appendChild(btn); });
+        } else document.getElementById("escortSection").style.display = "none";
+        
+        let werewolfDiv = document.getElementById("werewolfTargets");
+        if(werewolfExists && isFullMoon) {
+            document.getElementById("werewolfSection").style.display = "block";
+            werewolfDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#werewolfTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedWerewolfTarget = p.name; }; werewolfDiv.appendChild(btn); });
+        } else document.getElementById("werewolfSection").style.display = "none";
+        
+        let vampireDiv = document.getElementById("vampireTargets");
+        if(vampireExists) {
+            document.getElementById("vampireSection").style.display = "block";
+            vampireDiv.innerHTML = "";
+            alivePlayers.forEach(p => { let btn = document.createElement("div"); btn.className = "vote-btn"; btn.innerText = p.name; btn.onclick = () => { document.querySelectorAll("#vampireTargets .vote-btn").forEach(b => b.classList.remove("selected")); btn.classList.add("selected"); selectedVampireTarget = p.name; }; vampireDiv.appendChild(btn); });
+        } else document.getElementById("vampireSection").style.display = "none";
+    }
+    
+    window.submitNightActions = function() {
+        let mafiaTargetObj = players.find(p => p.name === selectedMafiaTarget);
+        let savedObj = players.find(p => p.name === selectedDoctorTarget);
+        let janitorTargetObj = players.find(p => p.name === selectedJanitorTarget);
+        let werewolfTargetObj = players.find(p => p.name === selectedWerewolfTarget);
+        let vampireTargetObj = players.find(p => p.name === selectedVampireTarget);
+        let killedName = "", killedBy = "";
+        if(mafiaTargetObj && mafiaTargetObj.isAlive) {
+            killedName = mafiaTargetObj.name; killedBy = "mafia";
+            if(savedObj && savedObj.name === killedName) { lastNightResult = `🩺 دکتر ${savedObj.name} را نجات داد. امشب کسی کشته نشد.`; killedName = ""; }
+        }
+        if(werewolfTargetObj && werewolfTargetObj.isAlive && (nightCount % 4 == 0)) {
+            if(killedName === "") { killedName = werewolfTargetObj.name; killedBy = "werewolf"; lastNightResult = `🐺 ورولو ${killedName} را کشت.`; }
+        }
+        if(vampireTargetObj && vampireTargetObj.isAlive && vampireTargetObj.role !== "vampire") { vampireTargetObj.role = "vampire"; lastNightResult += `<br>🧛 ${vampireTargetObj.name} توسط ومپایر گاز گرفته شد و اکنون ومپایر است!`; }
+        if(killedName !== "") {
+            let killedIndex = players.findIndex(p => p.name === killedName);
+            if(killedIndex !== -1) {
+                players[killedIndex].isAlive = false;
+                if(janitorTargetObj && killedBy === "mafia") lastNightResult = `🧹 ژنیتر صحنه جرم را به نام ${janitorTargetObj.name} انداخت. (در واقع ${killedName} کشته شد)`;
+                else if(!lastNightResult.includes("کشته")) lastNightResult = `🗡️ مافیا ${killedName} را کشت.`;
+            }
+        }
+        let detectiveTargetObj = players.find(p => p.name === selectedDetectiveTarget);
+        if(detectiveTargetObj && !detectiveBlocked) {
+            let isMafia = (detectiveTargetObj.role === "mafia");
+            let resultText = `🔍 استعلام از ${detectiveTargetObj.name}: ${isMafia ? "❌ مافیا است" : "✅ مافیا نیست"}`;
+            lastNightResult += `<br>${resultText}`;
+            let resultBox = document.getElementById("detectiveResultBox");
+            resultBox.innerHTML = resultText;
+            resultBox.style.display = "block";
+        } else if(detectiveBlocked) lastNightResult += `<br>💃 اسکورت حواس کارآگاه را پرت کرد! امشب استعلامی انجام نشد.`;
+        document.getElementById("nightPanel").style.display = "none";
+        gameState = "voting1";
+        currentVotingRound = 1;
+        startVotingPhase();
+        updateUI();
+    };
+    
+    function startVotingPhase() {
+        votingTemp = [];
+        for(let i=0; i<players.length; i++) votingTemp.push([]);
+        if(currentVotingRound === 1) {
+            document.getElementById("votingTitle").innerHTML = "🗳️ رأی‌گیری مرحله اول <br> <span style='font-size:0.8rem;'>✅ هر بازیکن می‌تواند به چند نفر (حتی همه، غیر از خودش) رأی دهد</span>";
+            renderVotingPhase1();
+        } else {
+            document.getElementById("votingTitle").innerHTML = "😴 خواب نیم‌روزی - رأی‌گیری نهایی <br> <span style='font-size:0.8rem;'>✅ هر بازیکن فقط به یک نفر رأی می‌دهد</span>";
+            renderVotingPhase2();
+        }
+        document.getElementById("votingPanel").style.display = "block";
+        document.getElementById("talkPanel").style.display = "none";
+        document.getElementById("nightPanel").style.display = "none";
+    }
+    
+    function renderVotingPhase1() {
+        let container = document.getElementById("votingOptions");
+        container.innerHTML = "";
+        for(let i=0; i<players.length; i++) {
+            if(!players[i].isAlive) continue;
+            let voter = players[i];
+            let div = document.createElement("div");
+            div.className = "voting-player";
+            div.innerHTML = `<div class="voting-player-name">🗳️ ${voter.name}</div><div class="checkbox-group" id="checkGroup_${i}"></div>`;
+            container.appendChild(div);
+            let group = div.querySelector(".checkbox-group");
+            for(let j=0; j<players.length; j++) {
+                if(!players[j].isAlive) continue;
+                if(players[j].name === voter.name) continue;
+                let label = document.createElement("label");
+                label.innerHTML = `<input type="checkbox" value="${players[j].name}" class="voteCheck_${i}"> ${players[j].name}`;
+                group.appendChild(label);
+            }
+        }
+    }
+    
+    function renderVotingPhase2() {
+        let container = document.getElementById("votingOptions");
+        container.innerHTML = "";
+        for(let i=0; i<players.length; i++) {
+            if(!players[i].isAlive) continue;
+            let voter = players[i];
+            let div = document.createElement("div");
+            div.className = "voting-player";
+            div.innerHTML = `<div class="voting-player-name">🗳️ ${voter.name}</div><div class="checkbox-group" id="radioGroup_${i}"></div>`;
+            container.appendChild(div);
+            let group = div.querySelector(".checkbox-group");
+            for(let j=0; j<players.length; j++) {
+                if(!players[j].isAlive) continue;
+                if(players[j].name === voter.name) continue;
+                let label = document.createElement("label");
+                label.innerHTML = `<input type="radio" name="vote_${i}" value="${players[j].name}"> ${players[j].name}`;
+                group.appendChild(label);
+            }
+        }
+    }
+    
+    window.finalizeVoting = function() {
+        if(currentVotingRound === 1) {
+            for(let i=0; i<players.length; i++) {
+                if(!players[i].isAlive) continue;
+                let checkboxes = document.querySelectorAll(`.voteCheck_${i}:checked`);
+                votingTemp[i] = [];
+                checkboxes.forEach(cb => votingTemp[i].push(cb.value));
+            }
+            let voteMap = new Map();
+            for(let votes of votingTemp) for(let targetName of votes) voteMap.set(targetName, (voteMap.get(targetName) || 0) + 1);
+            let maxVote = 0, maxPerson = "";
+            for(let [name, count] of voteMap) if(count > maxVote) { maxVote = count; maxPerson = name; }
+            let needed = Math.floor(players.filter(p => p.isAlive).length / 2) + 1;
+            if(maxVote >= needed && maxPerson !== "") {
+                alert(`👑 ${maxPerson} با ${maxVote} رأی به مرحله دوم رفت`);
+                currentVotingRound = 2;
+                startVotingPhase();
+            } else {
+                alert(`هیچکس رأی کافی نیاورد. روز جدید شروع می‌شود.`);
+                gameState = "dayTalk";
+                currentTalkIndex = 0;
+                startTalkPhase();
+                document.getElementById("votingPanel").style.display = "none";
+                updateUI();
+            }
+            updateVoteBadges();
+            setTimeout(() => { for(let i=0;i<players.length;i++) players[i].voteCount = 0; renderPlayersMap(); }, 2000);
+        } else if(currentVotingRound === 2) {
+            for(let i=0; i<players.length; i++) {
+                if(!players[i].isAlive) continue;
+                let selected = document.querySelector(`input[name="vote_${i}"]:checked`);
+                votingTemp[i] = selected ? [selected.value] : [];
+            }
+            let voteMap = new Map();
+            for(let votes of votingTemp) for(let targetName of votes) voteMap.set(targetName, (voteMap.get(targetName) || 0) + 1);
+            let maxVote = 0, maxPerson = "";
+            for(let [name, count] of voteMap) if(count > maxVote) { maxVote = count; maxPerson = name; }
+            if(maxPerson !== "" && maxVote > 0) {
+                let executed = players.find(p => p.name === maxPerson);
+                if(executed && executed.isAlive) { executed.isAlive = false; lastNightResult = `👨‍⚖️ بعد از رأی‌گیری نهایی، ${executed.name} با ${maxVote} رأی اعدام شد.`; }
+            } else lastNightResult = "رأی‌گیری به تساوی انجامید و کسی اعدام نشد.";
+            gameState = "dayTalk";
+            currentTalkIndex = 0;
+            startTalkPhase();
+            document.getElementById("votingPanel").style.display = "none";
+            updateUI();
+            updateVoteBadges();
+            setTimeout(() => { for(let i=0;i<players.length;i++) players[i].voteCount = 0; renderPlayersMap(); }, 2000);
+        }
+    };
+    
+    window.nextPhase = function() {
+        if(gameState === "dayTalk") { stopTimer(); gameState = "night"; updateUI(); document.getElementById("talkPanel").style.display = "none"; document.getElementById("nightPanel").style.display = "block"; prepareNightPhase(); }
+        else if(gameState === "night") alert("🌙 ابتدا اقدامات شب را کامل کنید و دکمه 'تأیید و پایان شب' را بزنید.");
+        else if(gameState === "voting1" || gameState === "voting2") alert("🗳️ ابتدا رأی‌گیری را نهایی کنید.");
+        else alert("در وضعیت فعلی نمی‌توانید به مرحله بعد بروید.");
+    };
+    
+    window.resetFullGame = function() { location.reload(); };
+    
+    for(let i=0; i<5; i++) addPlayerField();
+    selectGameMode('advanced');
+</script>
+</body>
+</html>

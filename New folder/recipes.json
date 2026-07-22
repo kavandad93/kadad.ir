@@ -1,0 +1,10 @@
+{
+ "hot":{
+  "latte":{"ingredients":{"espresso":30,"milk":200},"steps":["brew","mix"]},
+  "espresso":{"ingredients":{"espresso":30},"steps":["brew"]}
+ },
+ "ice":{
+  "latte":{"ingredients":{"espresso":30,"milk":180,"ice":100},"steps":["brew","ice"]},
+  "frappe":{"ingredients":{"coffee":40,"milk":150,"ice":120},"steps":["blend"]}
+ }
+}
