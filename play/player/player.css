@@ -1,0 +1,69 @@
+body {
+  margin: 0;
+  background: black;
+}
+
+.player {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+}
+.left input[type=range] {
+  width: 0;
+  transition: 0.3s;
+}
+
+.left:hover input[type=range] {
+  width: 80px;
+}
+
+video {
+  width: 100%;
+}
+
+/* LOADING */
+#loading {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* CONTROLS */
+.controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(0,0,0,0.5);
+}
+
+.left, .right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+img {
+  width: 26px;
+  cursor: pointer;
+}
+
+/* VOLUME SLIDER */
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.volume input {
+  width: 80px;
+  display: none;
+}
+
+.volume:hover input {
+  display: block;
+}
