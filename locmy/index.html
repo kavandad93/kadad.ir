@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="LocMy؛ پنل اشتراک‌گذاری لوکیشن، ساخت گروه، پیام‌رسانی و رویدادهای مکانی." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
+  <title>LocMy | پنل لوکیشن گروهی</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero panel">
+      <div>
+        <span class="eyebrow">LocMy PWA</span>
+        <h1>پنل لوکیشن زنده بدون اجبار به لاگین</h1>
+        <p>اسم خودت را وارد کن، لوکیشن را شیر کن، دوستانت را روی نقشه ببین و برای رسیدن به نقطه‌های مهم نوتیفیکیشن بگیر.</p>
+        <div class="actions">
+          <button id="installBtn" class="primary" hidden>نصب مثل اپلیکیشن</button>
+          <button id="notifyBtn">فعال‌سازی نوتیفیکیشن</button>
+        </div>
+      </div>
+      <div class="phone-card" aria-label="نمایش وضعیت اپ">
+        <strong>وضعیت زنده</strong>
+        <span id="sharingState">لوکیشن هنوز ارسال نشده</span>
+        <small>داده‌ها فعلاً روی همین دستگاه ذخیره می‌شوند.</small>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel identity">
+        <h2>ورود سریع مهمان</h2>
+        <p>برای دیدن نقشه لاگین لازم نیست؛ فقط قبل از اشتراک لوکیشن نام نمایشی خود را وارد کنید.</p>
+        <label>نام شما
+          <input id="displayName" maxlength="32" placeholder="مثلاً علی" />
+        </label>
+        <button id="shareLocation" class="primary">اشتراک لوکیشن من</button>
+        <p class="hint">برای امکانات بیشتر مثل ذخیره علاقه‌مندی‌ها، تاریخچه، رویدادهای خصوصی و همگام‌سازی باید رایگان ثبت‌نام/لاگین کنید.</p>
+      </section>
+
+      <section class="panel map-panel">
+        <div class="section-title">
+          <h2>نقشه افراد و مقصدها</h2>
+          <button id="addPoint">ثبت نقطه روی نقشه</button>
+        </div>
+        <div id="map" class="map" role="application" aria-label="نقشه LocMy">
+          <div class="radius"></div>
+        </div>
+        <p class="hint">روی نقشه کلیک کنید تا مقصد جدید بسازید. وقتی به شعاع مقصد برسید اعلان داده می‌شود.</p>
+      </section>
+
+      <section class="panel">
+        <h2>افراد آنلاین</h2>
+        <div id="peopleList" class="list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>گروه‌ها و پیام‌ها</h2>
+        <form id="groupForm" class="stack">
+          <input id="groupName" placeholder="نام گروه" required />
+          <input id="groupMembers" placeholder="اسم‌ها یا اکانت‌های مجاز، جداشده با ویرگول" />
+          <button class="primary">ساخت گروه</button>
+        </form>
+        <div id="groupsList" class="list"></div>
+        <form id="messageForm" class="message-row">
+          <input id="messageText" placeholder="پیام گروهی بنویسید" />
+          <button>ارسال</button>
+        </form>
+      </section>
+
+      <section class="panel wide">
+        <div class="section-title">
+          <h2>رویدادها</h2>
+          <span class="badge">عمومی یا خصوصی</span>
+        </div>
+        <form id="eventForm" class="event-form">
+          <input id="eventTitle" placeholder="عنوان رویداد" required />
+          <input id="eventAccess" placeholder="نام/اکانت‌های مجاز برای رویداد خصوصی" />
+          <button class="primary">حضور یا تغییر رویداد</button>
+        </form>
+        <div id="eventsList" class="cards"></div>
+      </section>
+
+      <section class="panel premium wide">
+        <h2>امکانات رایگان با ثبت‌نام</h2>
+        <div class="features">
+          <span>⭐ ذخیره Favها</span><span>🔒 رویداد خصوصی</span><span>💬 پیام‌رسانی کامل</span><span>👥 مدیریت گروه</span><span>☁️ بکاپ ابری</span>
+        </div>
+        <button id="authBtn">ثبت‌نام / لاگین رایگان</button>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
