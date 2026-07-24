@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="LocMy؛ اپ نصب‌شدنی نقشه زنده، چت خصوصی و گروهی و قرارهای مکانی." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <title>LocMy | نقشه و چت گروهی</title>
+</head>
+<body>
+  <main id="landing" class="landing">
+    <section class="landing-card">
+      <span class="eyebrow">LocMy PWA</span>
+      <h1>قبل از نصب، فقط معرفی کامل LocMy را می‌بینید</h1>
+      <p>بعد از نصب، صفحه اصلی مستقیماً یک نقشه Leaflet تمام‌صفحه است که همه افراد، قرارها و رویدادها روی آن مشخص می‌شوند.</p>
+      <div class="feature-grid">
+        <article><strong>🗺️ نقشه زنده</strong><span>نمایش افراد، قرارها، رویدادهای عمومی و خصوصی روی Leaflet.</span></article>
+        <article><strong>💬 چت حبابی</strong><span>با زدن دکمه شناور، چت خصوصی با هر نفر یا چت گروهی باز می‌شود.</span></article>
+        <article><strong>👥 گروه‌ها</strong><span>ساخت گروه با اسم‌ها یا اکانت‌های خاص و گفتگو داخل همان گروه.</span></article>
+        <article><strong>🔔 اعلان رسیدن</strong><span>اگر کاربر به محدوده یک قرار برسد، نوتیفیکیشن دریافت می‌کند.</span></article>
+        <article><strong>🚪 بدون لاگین اجباری</strong><span>برای اشتراک لوکیشن مهمان فقط نام لازم است؛ امکانات بیشتر با ثبت‌نام رایگان فعال می‌شود.</span></article>
+        <article><strong>⭐ امکانات حساب</strong><span>ذخیره Favها، بکاپ، تاریخچه، رویداد خصوصی و مدیریت حرفه‌ای گروه‌ها.</span></article>
+      </div>
+      <div class="actions">
+        <button id="installBtn" class="primary" hidden>نصب LocMy</button>
+      </div>
+      <p class="hint">در مرورگرهایی که نصب PWA را پشتیبانی کنند، دکمه نصب نمایش داده می‌شود. پس از نصب، همین آدرس در حالت اپ باز می‌شود.</p>
+    </section>
+  </main>
+
+  <section id="app" class="installed-app" hidden>
+    <div id="map" class="leaflet-map" aria-label="نقشه اصلی LocMy"></div>
+
+    <aside class="top-panel">
+      <strong>LocMy</strong>
+      <span id="sharingState">نام خود را بزنید و لوکیشن را شیر کنید</span>
+      <label>
+        <input id="displayName" maxlength="32" placeholder="نام شما" />
+      </label>
+      <div class="panel-actions">
+        <button id="shareLocation" class="primary">اشتراک لوکیشن</button>
+        <button id="addMeetup">ثبت قرار روی مرکز نقشه</button>
+        <button id="notifyBtn">نوتیفیکیشن</button>
+      </div>
+    </aside>
+
+    <button id="chatFab" class="chat-fab" aria-label="باز کردن چت">💬</button>
+
+    <aside id="chatDrawer" class="chat-drawer" aria-label="پنل چت" hidden>
+      <header>
+        <div>
+          <span class="eyebrow">Chat</span>
+          <h2>چت خصوصی و گروهی</h2>
+        </div>
+        <button id="closeChat">×</button>
+      </header>
+      <div class="chat-layout">
+        <nav id="chatTargets" class="chat-targets"></nav>
+        <section class="chat-box">
+          <h3 id="chatTitle">یک گفتگو انتخاب کنید</h3>
+          <div id="chatMessages" class="chat-messages"></div>
+          <form id="messageForm" class="message-form">
+            <input id="messageText" placeholder="پیام بنویسید" />
+            <button>ارسال</button>
+          </form>
+        </section>
+      </div>
+      <form id="groupForm" class="group-form">
+        <input id="groupName" placeholder="نام گروه جدید" required />
+        <input id="groupMembers" placeholder="اعضا/اکانت‌های مجاز با ویرگول" />
+        <button class="primary">ساخت گروه</button>
+      </form>
+    </aside>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
