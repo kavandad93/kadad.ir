@@ -11,3 +11,4 @@
   "description": "اپ نصب‌شدنی نقشه Leaflet، چت خصوصی، گروه‌ها و قرارهای مکانی.",
   "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }
+{"name":"LocMy","short_name":"LocMy","start_url":"./","display":"standalone","dir":"rtl","lang":"fa","theme_color":"#0f172a","background_color":"#020617","description":"پنل لوکیشن گروهی، پیام، گروه و رویدادهای مکانی.","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml"}]}
