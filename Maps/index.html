@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#08111f" />
+  <meta name="description" content="Maps؛ اپ نصب‌شدنی نقشه زنده، چت خصوصی و گروهی، رویدادهای مکانی و اعلان رسیدن." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Maps | نقشه زنده و رویداد گروهی</title>
+</head>
+<body>
+  <main id="landing" class="landing">
+    <section class="intro-card glass">
+      <span class="badge">Maps AAA PWA</span>
+      <h1>قبل از نصب، معرفی کامل؛ بعد از نصب، یک اپ نقشه زنده.</h1>
+      <p>Maps مثل یک اپلیکیشن نصب می‌شود. تا وقتی نصب نشده فقط ویژگی‌ها، امنیت، نحوه کار و دکمه نصب را می‌بینید؛ بعد از نصب صفحه اصلی مستقیماً نقشه Leaflet تمام‌صفحه است.</p>
+      <div class="showcase">
+        <article><b>🗺️ نقشه زنده</b><span>همه افراد، قرارها، Favها و رویدادهای عمومی/خصوصی روی نقشه دیده می‌شوند.</span></article>
+        <article><b>🚪 بدون لاگین اجباری</b><span>هر نفر قبل از Share Location فقط اسمش را می‌زند و وارد نقشه می‌شود.</span></article>
+        <article><b>🔔 اعلان رسیدن</b><span>هر کس نقطه‌ای تنظیم کند، با رسیدن افراد به محدوده آن نقطه نوتیفیکیشن می‌گیرد.</span></article>
+        <article><b>💬 حباب چت</b><span>دکمه شناور چت، گفتگو خصوصی با افراد و چت گروهی را باز می‌کند.</span></article>
+        <article><b>👥 گروه و رویداد خاص</b><span>گروه بسازید و رویدادهایی تعریف کنید که فقط با اسم‌ها یا اکانت‌های خاص کار کنند.</span></article>
+        <article><b>⭐ حساب رایگان</b><span>برای Favها، همگام‌سازی، تاریخچه، مدیریت پیشرفته و امکانات بیشتر ثبت‌نام رایگان لازم است.</span></article>
+      </div>
+      <div class="cta-row">
+        <button id="installBtn" class="primary" hidden>نصب Maps</button>
+        <a class="ghost" href="?app=1">پیش‌نمایش حالت نصب‌شده</a>
+      </div>
+    </section>
+  </main>
+
+  <section id="app" class="app" hidden>
+    <div id="map" class="map" aria-label="نقشه اصلی Maps"></div>
+    <aside class="command glass">
+      <div class="brand"><span>Maps</span><small id="modeText">حالت اپ نصب‌شده</small></div>
+      <label>نام قبل از اشتراک لوکیشن
+        <input id="displayName" maxlength="32" placeholder="مثلاً کیارش" autocomplete="name" />
+      </label>
+      <div id="sharingState" class="status">لوکیشن هنوز شیر نشده است.</div>
+      <div class="actions">
+        <button id="shareLocation" class="primary">Share Location</button>
+        <button id="addPoint">ثبت نقطه مرکز نقشه</button>
+        <button id="notifyBtn">فعال‌سازی اعلان</button>
+      </div>
+      <button id="loginBtn" class="upgrade">ثبت‌نام/لاگین رایگان برای Favها و امکانات بیشتر</button>
+    </aside>
+
+    <aside class="events glass">
+      <h2>رویدادها و قرارها</h2>
+      <form id="eventForm" class="stack">
+        <input id="eventTitle" placeholder="نام رویداد گروهی" required />
+        <input id="eventAccess" placeholder="اسم‌ها/اکانت‌های مجاز با ویرگول (اختیاری)" />
+        <button class="primary">ساخت رویداد</button>
+      </form>
+      <div id="eventList" class="list"></div>
+    </aside>
+
+    <button id="chatFab" class="chat-fab" aria-label="باز کردن چت">💬</button>
+    <aside id="chatDrawer" class="chat-drawer glass" hidden>
+      <header><div><span class="badge">Chat Hub</span><h2>چت خصوصی و گروهی</h2></div><button id="closeChat">×</button></header>
+      <div class="chat-grid"><nav id="chatTargets"></nav><section><h3 id="chatTitle">یک گفتگو انتخاب کنید</h3><div id="chatMessages" class="messages"></div><form id="messageForm"><input id="messageText" placeholder="پیام بنویسید" /><button>ارسال</button></form></section></div>
+      <form id="groupForm" class="group-form"><input id="groupName" placeholder="نام گروه" required /><input id="groupMembers" placeholder="اعضا/اکانت‌های مجاز" /><button class="primary">ساخت گروه</button></form>
+    </aside>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
